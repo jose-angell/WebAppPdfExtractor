@@ -1,0 +1,21 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Extraer datos de un PDF</h1>
+    <p>Esta aplicacion tiene como objetivo acceder a los datos dentro de un archivo PDF y extraer el texto.</p>
+</div>
+<hr/>
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div class="form-group">
+                <label class="control-label">Archivo</label>
+                <input type="file" class="form-control"/>
+            </div>
+        </form>
+    </div>
+</div>

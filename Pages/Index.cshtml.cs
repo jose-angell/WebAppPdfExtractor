@@ -6,6 +6,7 @@ using iText.Layout.Element;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Diagnostics;
+using WebApplicationPDFExtractor.Models;
 
 
 namespace WebApplicationPDFExtractor.Pages
@@ -13,6 +14,8 @@ namespace WebApplicationPDFExtractor.Pages
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
+
+        public DocumentoModel datosDocumento = new DocumentoModel();
       
         public IndexModel(ILogger<IndexModel> logger)
         {
@@ -23,7 +26,7 @@ namespace WebApplicationPDFExtractor.Pages
         {
 
         }
-        public async void OnPost(IFormFile archivo)
+        public async Task<IActionResult> OnPost(IFormFile archivo)
         {
             using (var memoryStream = new MemoryStream())
             {
@@ -32,16 +35,20 @@ namespace WebApplicationPDFExtractor.Pages
                 memoryStream.Position = 0;
                 using (PdfReader pdfRead = new PdfReader(memoryStream))
                 {
-                    PdfDocument pdfDoc = new PdfDocument(pdfRead);
-                    for(int page = 1; page <= pdfDoc.GetNumberOfPages(); page++)
+                    using (PdfDocument pdfDoc = new PdfDocument(pdfRead))
                     {
-                        ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-                        string data = PdfTextExtractor.GetTextFromPage(pdfDoc.GetPage(page), strategy);
-                        Debug.WriteLine(data);
+                        //for (int page = 1; page <= pdfDoc.GetNumberOfPages(); page++)
+                        //{
+                            ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
+                            string data = PdfTextExtractor.GetTextFromPage(pdfDoc.GetPage(1), strategy);
+
+                            Debug.WriteLine(data);
+                        //}
+                        datosDocumento.RazonSocial = data;
                     }
                 }
             }
-
+            return Page();
         }
     }
 }

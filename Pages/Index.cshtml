@@ -19,4 +19,11 @@
             </div>
         </form>
     </div>
+    <div>
+        @if( Model.datosDocumento != null)
+        {
+            <h2>Datos del archivo</h2>
+            <p>@Model.datosDocumento.RazonSocial</p>
+        }
+    </div>
 </div>

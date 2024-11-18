@@ -5,7 +5,7 @@ namespace WebApplicationPDFExtractor.Models
     public class DocumentoModel
     {
         [Display(Name = "Razon Social")]
-        public string RazonSocial { get; set; }
+        public string? RazonSocial { get; set; }
 
         [Display(Name = "Clave de RFC")]
         public string? RFC {  get; set; }
@@ -13,7 +13,7 @@ namespace WebApplicationPDFExtractor.Models
         [Display(Name = "Regimen Fiscal")]
         public string? RegimenFiscal { get; set; }
 
-        [Display(Name = "Clave de Uso")]
+        [Display(Name = "Clave de Uso CFDI")]
         public string? ClavedeUso { get; set; }
 
         [Display(Name = "Calle")]

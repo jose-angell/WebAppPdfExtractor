@@ -1,11 +1,10 @@
+using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
+using iText.Kernel.Pdf.Canvas.Parser.Filter;
 using iText.Kernel.Pdf.Canvas.Parser.Listener;
-using iText.Layout;
-using iText.Layout.Element;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Diagnostics;
 using WebApplicationPDFExtractor.Models;
 
 
@@ -33,20 +32,24 @@ namespace WebApplicationPDFExtractor.Pages
                 await archivo.CopyToAsync(memoryStream);
 
                 memoryStream.Position = 0;
-                using (PdfReader pdfRead = new PdfReader(memoryStream))
+                
+                using (PdfDocument pdfDoc = new PdfDocument(new PdfReader(memoryStream)))
                 {
-                    using (PdfDocument pdfDoc = new PdfDocument(pdfRead))
-                    {
-                        //for (int page = 1; page <= pdfDoc.GetNumberOfPages(); page++)
-                        //{
-                            ITextExtractionStrategy strategy = new SimpleTextExtractionStrategy();
-                            string data = PdfTextExtractor.GetTextFromPage(pdfDoc.GetPage(1), strategy);
+                    var pageSize = pdfDoc.GetDefaultPageSize();
+                    float widtPoints = pageSize.GetWidth();
+                    float hidtPoints = pageSize.GetHeight();
+                    var region = new Rectangle(120, 600, 200, 200);
+                    
+                    ITextExtractionStrategy strategy = new FilteredTextEventListener(
+                        new LocationTextExtractionStrategy(),
+                        new TextRegionEventFilter(region)
+                        );
+                    
+                    string data = PdfTextExtractor.GetTextFromPage(pdfDoc.GetPage(1), strategy);
 
-                            Debug.WriteLine(data);
-                        //}
-                        datosDocumento.RazonSocial = data;
-                    }
+                    datosDocumento.RazonSocial = data;
                 }
+                
             }
             return Page();
         }

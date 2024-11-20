@@ -38,15 +38,19 @@ namespace WebApplicationPDFExtractor.Pages
                     var pageSize = pdfDoc.GetDefaultPageSize();
                     float widtPoints = pageSize.GetWidth();
                     float hidtPoints = pageSize.GetHeight();
-                    var region = new Rectangle(120, 600, 200, 200);
-                    
+                    var region = new Rectangle(230, 500, 80, 200);//200, 650, 200, 200 coordenadas para validar si el docuemto es una constancia fiscal
+
                     ITextExtractionStrategy strategy = new FilteredTextEventListener(
                         new LocationTextExtractionStrategy(),
                         new TextRegionEventFilter(region)
                         );
                     
                     string data = PdfTextExtractor.GetTextFromPage(pdfDoc.GetPage(1), strategy);
-
+                    int posicionInicial = data.IndexOf("FISCAL") + "FISCAL".Length;
+                    int posicionFinal = data.IndexOf("Registro");
+                    int caracteres = posicionFinal - posicionInicial;
+                    string rfctext = data.Substring(posicionInicial, caracteres);
+                    datosDocumento.RFC = rfctext;
                     datosDocumento.RazonSocial = data;
                 }
                 

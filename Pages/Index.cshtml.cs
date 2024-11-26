@@ -6,6 +6,7 @@ using iText.Kernel.Pdf.Canvas.Parser.Listener;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using WebApplicationPDFExtractor.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace WebApplicationPDFExtractor.Pages
@@ -44,18 +45,29 @@ namespace WebApplicationPDFExtractor.Pages
                         new LocationTextExtractionStrategy(),
                         new TextRegionEventFilter(region)
                         );
+                    ITextExtractionStrategy strategySimple = new SimpleTextExtractionStrategy();
+                    string data = PdfTextExtractor.GetTextFromPage(pdfDoc.GetPage(1), strategySimple);
                     
-                    string data = PdfTextExtractor.GetTextFromPage(pdfDoc.GetPage(1), strategy);
-                    int posicionInicial = data.IndexOf("FISCAL") + "FISCAL".Length;
-                    int posicionFinal = data.IndexOf("Registro");
-                    int caracteres = posicionFinal - posicionInicial;
-                    string rfctext = data.Substring(posicionInicial, caracteres);
-                    datosDocumento.RFC = rfctext;
-                    datosDocumento.RazonSocial = data;
+                    datosDocumento.RFC = GetDataFromString(data, "FISCAL", "Registro").Replace("\n","");
+                    datosDocumento.RazonSocial = GetDataFromString(data, "Contribuyentes", "Nombre,").Replace("\n", "");
+                    datosDocumento.Calle = GetDataFromString(data, "Nombre de Vialidad:", "Número Exterior:").Replace("\n", "");
+                    datosDocumento.NumeroExterior = GetDataFromString(data, "Número Exterior:", "Número Interior:").Replace("\n", "");
+                    datosDocumento.Colonia = GetDataFromString(data, "Nombre de la Colonia:", "Nombre de la Localidad:").Replace("\n", "");
+                    datosDocumento.Municipio = GetDataFromString(data, "Nombre del Municipio o Demarcación Territorial:", "Nombre de la Entidad Federativa:").Replace("\n", "");
+                    datosDocumento.Estado = GetDataFromString(data, "Nombre de la Entidad Federativa:", "Entre Calle:").Replace("\n", "");
+                    datosDocumento.CodigoPostal = GetDataFromString(data, "Código Postal:", "Tipo de Vialidad:").Replace("\n", ""); 
+                    datosDocumento.NombreContacto = data;
                 }
                 
             }
             return Page();
+        }
+        private string GetDataFromString(string text, string textBefore, string textAfter )
+        {
+            int posicionInicial = text.IndexOf(textBefore) + textBefore.Length;
+            int posicionFinal = text.IndexOf(textAfter);
+            int caracteres = posicionFinal - posicionInicial;
+            return text.Substring(posicionInicial, caracteres);
         }
     }
 }
